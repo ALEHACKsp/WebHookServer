@@ -1,2 +1,2 @@
 # WebHookServer
-The name kind of says it all. A C++ server for Github Webhooks!
+The name kind of says it all. A C++ server for Github Webhooks! Currently not working.
