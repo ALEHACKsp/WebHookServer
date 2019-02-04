@@ -1,0 +1,4 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/Kleinman/Documents/Programming/C:C++/WebHookServer
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/Kleinman/Documents/Programming/C:C++/WebHookServer/cmake-build-debug

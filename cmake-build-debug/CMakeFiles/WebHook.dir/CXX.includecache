@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/Kleinman/Documents/Programming/C:C++/WebHookServer/source/main.cpp
+iostream
+-
+sstream
+-
+string
+-
+thread
+-
+atomic
+-
+cstdio
+-
+cstdlib
+-
+cerrno
+-
+pthread.h
+-
+sys/socket.h
+-
+sys/types.h
+-
+sys/fcntl.h
+-
+arpa/inet.h
+-
+netinet/in.h
+-
+unistd.h
+-
+netdb.h
+-
+
