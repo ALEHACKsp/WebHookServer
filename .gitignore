@@ -5,7 +5,7 @@
 .DS_Store
 
 # CMake
-cmake-build.debug/
+cmake-build-debug/
 
 # Prerequisites
 *.d
