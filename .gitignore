@@ -6,6 +6,7 @@
 
 # CMake
 cmake-build-debug/
+build/  # If running CMake manually.
 
 # Prerequisites
 *.d
