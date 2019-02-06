@@ -47,7 +47,7 @@ std::string Receive(int socket, size_t max_size_to_receive)
     //          buffer: array to fill with the message.
     //          size: the size of the buffer.
     //          flags: options.
-    ssize_t bytes_received = read(socket, message, max_size_to_receive);
+    ssize_t bytes_received = recv(socket, message, max_size_to_receive, 0);
     if (bytes_received == -1)
         throw std::runtime_error("Issue with connection.");
     else if (bytes_received == 0)

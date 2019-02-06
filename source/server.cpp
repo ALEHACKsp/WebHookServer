@@ -69,7 +69,12 @@ int ConnectServer(const std::string& address, int port, int max_number_of_client
 
 
 
-int HandleClients(int listening_socket, const std::function<void(int, int)>& operation)
+int DelegateClients(
+        int listening_socket,
+        const std::function<void(int, int)>& start_up,
+        const std::function<void(int, int)>& running,
+        const std::function<void(int, int)>& tear_down
+)
 {
     unsigned counter = 0;
 
@@ -98,7 +103,11 @@ int HandleClients(int listening_socket, const std::function<void(int, int)>& ope
             // Child process.
             std::cout << "Client " << counter << " joined." << std::endl;
             close(listening_socket);
-            operation(client_socket, counter);
+
+            start_up(client_socket,  counter);
+            running(client_socket,   counter);
+            tear_down(client_socket, counter);
+
             exit(0);
         }
     }
