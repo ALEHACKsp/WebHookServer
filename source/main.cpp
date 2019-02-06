@@ -10,7 +10,7 @@
 #include "client.h"
 
 
-// ---- SHARED ----
+// ----  ----
 void Listen(int socket, int id, size_t max_transmission_size)
 {
     std::string starter = "Client " + std::to_string(id) + ": ";
@@ -25,15 +25,13 @@ void Listen(int socket, int id, size_t max_transmission_size)
 
 void Talk(int socket, int id)
 {
-    std::string starter = "Client " + std::to_string(id) + ": ";
-
     while (true)
     {
         std::string message;
         std::getline(std::cin, message);
 
         if (!message.empty())
-            Send(socket, starter+message);
+            Send(socket, message);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
@@ -52,21 +50,11 @@ void StartUp(int socket, int id)
 void Running(int socket, int id)
 {
     std::cout << "Running client " << id << std::endl;
-    std::string welcome_message = "Connection established!\n"
-                                  "Welcome!\n\n"
-                                  "* Type anything and press Enter to send.\n"
-                                  "* You can type ! followed by a bash command. A useful one is !clear.\n"
-                                  "* Press ctrl-c to quit the application.\n";
+    std::string welcome_message = "Connection established!";
     Send(socket, welcome_message);
 
     int max_transmission_size = 1000;
     Listen(socket, id, max_transmission_size);
-
-    // std::thread talk_thread(Talk, socket, id);
-    // std::thread listen_thread(Listen, socket, id, max_transmission_size);
-
-    // talk_thread.join();
-    // listen_thread.join();
 }
 
 void TearDown(int socket, int id)
