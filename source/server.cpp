@@ -85,6 +85,7 @@ int HandleClients(int listening_socket, const std::function<void(int, int)>& ope
             throw std::runtime_error("Couldn't accept request from client. Errno: " + std::to_string(errno) + ".");
 
         // http://man7.org/linux/man-pages/man2/fork.2.html
+        ++counter;
         int pid = fork();
 
         if (pid < 0)
@@ -95,7 +96,7 @@ int HandleClients(int listening_socket, const std::function<void(int, int)>& ope
         else
         {
             // Child process.
-            std::cout << "Client " << ++counter << " joined." << std::endl;
+            std::cout << "Client " << counter << " joined." << std::endl;
             close(listening_socket);
             operation(client_socket, counter);
             exit(0);
