@@ -97,6 +97,7 @@ void RunServer(std::string address, int port)
 {
     std::cout << "Listening for clients on port " << port << "." << std::endl;
     int socket = ConnectServer(address, port);
+    std::cout << "Calling HandleClients from server." << std::endl;
     HandleClients(socket, Communication);
 }
 
@@ -106,6 +107,7 @@ void RunClient(std::string address, int port)
     std::cout << "Trying to connect to server " << address << " on port " << port << "." << std::endl;
     int socket = ConnectClient(address, port);
     std::string id = Receive(socket, 100);
+    std::cout << "Calling communication from client." << std::endl;
     Communication(socket, std::atoi(id.c_str()));
 }
 
