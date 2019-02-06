@@ -12,7 +12,6 @@
 
 int ConnectServer(const std::string& address, int port, int max_number_of_clients)
 {
-
     // The steps involved in establishing a socket on the server side are as follows:
     //
     //     1. Create a socket with the socket() system call.
@@ -23,9 +22,7 @@ int ConnectServer(const std::string& address, int port, int max_number_of_client
     //        with the server.
     //     5. Send and receive data.
 
-
     int success;
-
 
     // http://man7.org/linux/man-pages/man2/socket.2.html
     //     socket(domain, type, protocol) creates an endpoint for communication and returns a file descriptor that
@@ -56,16 +53,68 @@ int ConnectServer(const std::string& address, int port, int max_number_of_client
         throw std::runtime_error("Can't listen to socket. Errno: " + std::to_string(errno) + ".");
 
 
-    // http://man7.org/linux/man-pages/man2/accept.2.html
-    //     accept(socket, address, size, flags)
-    //         socket: socket of type SOCK_STREAM or SOCK_SEQPACKET.
-    sockaddr_in client_address{};
-    socklen_t client_address_size = sizeof(client_address);
-    int client_socket = accept(listen_socket, (sockaddr*)&client_address, &client_address_size);
-    if (client_socket == -1)
-        throw std::runtime_error("Couldn't accept request from client. Errno: " + std::to_string(errno) + ".");
-
-
-    close(listen_socket);
-    return client_socket;
+    // // http://man7.org/linux/man-pages/man2/accept.2.html
+    // //     accept(socket, address, size, flags)
+    // //         socket: socket of type SOCK_STREAM or SOCK_SEQPACKET.
+    // sockaddr_in client_address{};
+    // socklen_t client_address_size = sizeof(client_address);
+    // int client_socket = accept(listen_socket, (sockaddr*)&client_address, &client_address_size);
+    // if (client_socket == -1)
+    //     throw std::runtime_error("Couldn't accept request from client. Errno: " + std::to_string(errno) + ".");
+    //
+    //
+    // close(listen_socket);
+    return listen_socket;
 }
+
+
+
+int HandleClients(int listening_socket, const std::function<void(int, int)>& operation)
+{
+    unsigned counter = 0;
+
+    while (true)
+    {
+        // http://man7.org/linux/man-pages/man2/accept.2.html
+        //     accept(socket, address, size, flags)
+        //         socket: socket of type SOCK_STREAM or SOCK_SEQPACKET.
+        sockaddr_in client_address{};
+        socklen_t client_address_size = sizeof(client_address);
+        int client_socket = accept(listening_socket, (sockaddr*)&client_address, &client_address_size);
+        if (client_socket == -1)
+            throw std::runtime_error("Couldn't accept request from client. Errno: " + std::to_string(errno) + ".");
+
+        // http://man7.org/linux/man-pages/man2/fork.2.html
+        int pid = fork();
+
+        if (pid < 0)
+            throw std::runtime_error("Couldn't create fork.");
+        else if (pid != 0)
+            // Parent process (pid is the pid of child process).
+            close(client_socket);
+        else
+        {
+            // Child process.
+            std::cout << "Client " << ++counter << " joined." << std::endl;
+            close(listening_socket);
+            operation(client_socket, counter);
+            exit(0);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -10,7 +10,6 @@
 #include "client.h"
 
 
-std::atomic<bool> connected;
 
 struct Options
 {
@@ -51,28 +50,63 @@ Options ParseCommandArguments(int argc, char* argv[])
 }
 
 
-void Listen(int socket, size_t max_transmission_size)
+void Listen(int socket, int id, size_t max_transmission_size)
 {
-    while (connected)
+    std::string starter = "Client " + std::to_string(id) + ": ";
+
+    while (true)
     {
         std::string message = Receive(socket, max_transmission_size);
-        std::cout << ">>> " << message << std::endl;
+        std::cout << starter << message << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
-void Talk(int socket)
+void Talk(int socket, int id)
 {
-    while (connected)
+    std::string starter = "Client " + std::to_string(id) + ": ";
+
+    while (true)
     {
         std::string message;
         std::getline(std::cin, message);
 
         if (!message.empty())
-            Send(socket, message);
+            Send(socket, starter+message);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+}
+
+
+void Communication(int socket, int id)
+{
+    int max_transmission_size = 1000;
+
+    std::thread talk_thread(Talk, socket, id);
+    std::thread listen_thread(Listen, socket, id, max_transmission_size);
+
+    talk_thread.join();
+    listen_thread.join();
+
+    std::cout << "Exiting program." << std::endl;
+}
+
+
+void RunServer(std::string address, int port)
+{
+    std::cout << "Listening for clients on port " << port << "." << std::endl;
+    int socket = ConnectServer(address, port);
+    HandleClients(socket, Communication);
+}
+
+
+void RunClient(std::string address, int port)
+{
+    std::cout << "Trying to connect to server " << address << " on port " << port << "." << std::endl;
+    int socket = ConnectClient(address, port);
+    std::string id = Receive(socket, 100);
+    Communication(socket, std::atoi(id.c_str()));
 }
 
 
@@ -84,39 +118,17 @@ int main(int argc, char* argv[])
     Options options;
     options = ParseCommandArguments(argc, argv);
 
-    int socket;
     if (options.server)
-    {
-        std::cout << "Listening for clients on port " << options.port << "." << std::endl;
-        socket = ConnectServer(options.address, options.port);
-    }
+        RunServer(options.address, options.port);
     else
     {
-        std::cout << "Trying to connect to server " << options.address << " on port " << options.port << "." << std::endl;
-        socket = ConnectClient(options.address, options.port);
+        std::cout << "Connection established!\n";
+        std::cout << "Welcome!\n\n"
+                     "* Type anything and press Enter to send.\n"
+                     "* You can type ! followed by a bash command. A useful one is !clear.\n"
+                     "* Press ctrl-c to quit the application.\n"
+                  << std::endl;
+        RunClient(options.address, options.port);
     }
 
-    std::cout << "Connection established!\n" << std::endl;
-    std::cout << "Welcome!\n\n"
-                 "* Type anything and press Enter to send.\n"
-                 "* You can type ! followed by a bash command. A useful one is !clear.\n"
-                 "* Press ctrl-c to quit the application.\n"
-              << std::endl;
-    connected = true;
-
-    int max_transmission_size = 1000;
-
-    std::thread talk_thread(Talk, socket);
-    std::thread listen_thread(Listen, socket, max_transmission_size);
-
-    while (connected)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
-    }
-
-    talk_thread.join();
-    listen_thread.join();
-
-    std::cout << "Exiting program." << std::endl;
-    return 0;
 }
